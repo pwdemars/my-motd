@@ -7,13 +7,13 @@ import os
 import datetime
 import dotenv
 import io
+import matplotlib.pyplot as plt 
 
 def SP_to_hour(SP):
 	m = '00' if SP%2 == 0 else '30'
 	h = str(int(SP/2))
 	hour = '{}:{}'.format(h,m)
 	return hour
-
 
 if __name__ == "__main__":
 
@@ -40,19 +40,31 @@ if __name__ == "__main__":
 	print("Max: {:.2f} MW at {}".format(max_imb['Imbalance Quantity (MAW)'].item(), SP_to_hour(max_imb['Settlement Period'].item())))
 	print()
 
-	# Imbalance prices
+	# System price
 	url = 'https://api.bmreports.com/BMRS/B1770/v1?APIKey={}&SettlementDate={}&Period=*&ServiceType=csv'.format(API_KEY, date)
 	response = requests.get(url, allow_redirects=True)
 	df = pd.read_csv(io.StringIO(response.content.decode('utf-8')), header=4, error_bad_lines=False)
+
+	# Filter to excess balance only (excess and insufficient are the same system price)
+	df = df[df['PriceCategory'] == 'Excess balance'].filter(['SettlementPeriod', 'ImbalancePriceAmount'])
+
+	# Get max and min system price
 	max_pr = df[df['ImbalancePriceAmount'] == df['ImbalancePriceAmount'].max()].head(1)
 	min_pr = df[df['ImbalancePriceAmount'] == df['ImbalancePriceAmount'].min()].head(1)
 	
-
-	print("Imbalance Price")
+	print("System Price")
 	print("------------------")
 	print("Min: £{:.2f} at SP {}".format(min_pr['ImbalancePriceAmount'].item(), SP_to_hour(min_pr['SettlementPeriod'].item())))
 	print("Max: £{:.2f} at SP {}".format(max_pr['ImbalancePriceAmount'].item(), SP_to_hour(max_pr['SettlementPeriod'].item())))
 	print()
+
+	# Plot system price
+	fig, ax = plt.subplots()
+	ax.plot(df.SettlementPeriod, df.ImbalancePriceAmount)
+	ax.set_xlabel('Settlement Period')
+	ax.set_ylabel('System Price (£ per MWh)')
+	plt.title('System Price: {}'.format(date))
+	plt.savefig('yesterday_system_price.png')
 
 	# Fuel mix 
 	url = 'https://api.bmreports.com/BMRS/B1620/v1?APIKey={}&SettlementDate={}&Period=*&ServiceType=csv'.format(API_KEY, date)
@@ -74,8 +86,3 @@ if __name__ == "__main__":
 	print()
 
 	print("Have a great day!")
-
-
-
-
-	
