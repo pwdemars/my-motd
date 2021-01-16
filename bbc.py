@@ -16,6 +16,8 @@ def get_bbc_headline():
 
 if __name__ == "__main__":
     headline, primer = get_bbc_headline()
-    print("BBC headline: {}".format(headline))
+    print("BBC News")
+    print("--------")
+    print("Headline: {}".format(headline))
     print(primer)
     print()
