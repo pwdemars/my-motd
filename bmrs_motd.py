@@ -7,7 +7,6 @@ import os
 import datetime
 import dotenv
 import io
-import matplotlib.pyplot as plt 
 
 def SP_to_hour(SP):
 	m = '00' if SP%2 == 0 else '30'
@@ -57,14 +56,6 @@ if __name__ == "__main__":
 	print("Min: £{:.2f} at SP {}".format(min_pr['ImbalancePriceAmount'].item(), SP_to_hour(min_pr['SettlementPeriod'].item())))
 	print("Max: £{:.2f} at SP {}".format(max_pr['ImbalancePriceAmount'].item(), SP_to_hour(max_pr['SettlementPeriod'].item())))
 	print()
-
-	# Plot system price
-	fig, ax = plt.subplots()
-	ax.plot(df.SettlementPeriod, df.ImbalancePriceAmount)
-	ax.set_xlabel('Settlement Period')
-	ax.set_ylabel('System Price (£ per MWh)')
-	plt.title('System Price: {}'.format(date))
-	plt.savefig('yesterday_system_price.png')
 
 	# Fuel mix 
 	url = 'https://api.bmreports.com/BMRS/B1620/v1?APIKey={}&SettlementDate={}&Period=*&ServiceType=csv'.format(API_KEY, date)

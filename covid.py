@@ -19,11 +19,13 @@ if __name__ == "__main__":
 
 	date = df.date.values[-1]
 	new_vaccs = df.newPeopleVaccinatedFirstDoseByPublishDate.values[-1]
+	week_vaccs = df.newPeopleVaccinatedFirstDoseByPublishDate.values[-7:]
 	cum_vaccs = df.cumPeopleVaccinatedFirstDoseByPublishDate.values[-1]
 	perc_vaccs = 100*cum_vaccs/UK_pop
 
 	print("UK Covid Vaccinations: {}".format(date))
 	print("---------------------------------")
 	print("New vaccinations: {}".format(int(new_vaccs)))
+	print("7-day average vaccinations: {}".format(int(week_vaccs.mean())))
 	print("Cumulative vaccinations: {} ({:.1f}%)".format(int(cum_vaccs), perc_vaccs))
 	print()
